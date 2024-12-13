@@ -13,12 +13,14 @@ import Service from './components/Service';
 import Booking from './components/Booking';
 import Detail from'./components/Detail';
 import Tripdetail from './components/Tripdetail';
+import Gallery from './components/Gallery';
 
 const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path='/' element={<MainLayout />}>
         <Route path='/home' element={<Home />} />
+        <Route path='/gallery' element={<Gallery />} />
         <Route path='/service' element={<Service />} />
         <Route path='/About' element={<About />} />
         <Route path='/book' element={<Booking />} />
