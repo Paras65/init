@@ -4,7 +4,7 @@ const TripDetailPage = () => {
     return (
       <div className="bg-gradient-to-r from-gray-100 via-gray-200 to-white text-gray-800">
         {/* Header Section */}
-        <section className="relative h-[70vh]">
+        <section className="relative h-[30vh]">
           <img
             src="https://picsum.photos/1500/800" // Replace with mountain image URL
             alt="Trip"
@@ -17,9 +17,7 @@ const TripDetailPage = () => {
             <p className="text-xl sm:text-2xl mb-6 text-gray-700">
               Explore the uncharted beauty of the mountains, a trip for the bold and adventurous.
             </p>
-            <button className="bg-blue-600 text-white py-3 px-8 rounded-lg text-lg font-bold shadow-md hover:bg-blue-500 transition">
-              Book Now
-            </button>
+            
           </div>
         </section>
   
