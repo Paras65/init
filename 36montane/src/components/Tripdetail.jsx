@@ -66,10 +66,10 @@ const TripDetailPage = () => {
               {tripData[0].details} {/* Dynamic trip details */}
             </p>
             <ul className="mt-6 space-y-4 text-lg text-gray-800">
-              <li><strong>Duration:</strong> {tripData.duration} Days</li>
-              <li><strong>Location:</strong> {tripData.location}</li>
-              <li><strong>Difficulty:</strong> {tripData.difficulty}</li>
-              <li><strong>Group Size:</strong> Max {tripData.maxGroupSize} People</li>
+              <li><strong>Duration:</strong> {tripData[0].duration} Days</li>
+              <li><strong>Location:</strong> {tripData[0].location}</li>
+              <li><strong>Difficulty:</strong> {tripData[0].difficulty}</li>
+              <li><strong>Group Size:</strong> Max {tripData[0].maxGroupSize} People</li>
             </ul>
           </div>
 
