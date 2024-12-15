@@ -181,7 +181,7 @@ app.post('/api/booking', async (req, res) => {
 
 
 
-  app.get('/api/gallery/', async (req, res) => {
+  app.get('/api/gallery/type', async (req, res) => {
     const { type } = req.query;  // Optional filter for media type (video or photo)
   
     // Validate the filter type

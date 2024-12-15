@@ -44,11 +44,17 @@ const Navbar = () => {
               <NavLink to="/service" className={linkClass}>
                 Services
               </NavLink>
+              <NavLink to="/event" className={linkClass}>
+                Events
+              </NavLink>
               <NavLink to="/about" className={linkClass}>
                 About
               </NavLink>
               <NavLink to="/contact" className={linkClass}>
                 Contact
+              </NavLink>
+              <NavLink to="/blogs" className={linkClass}>
+                Blogs
               </NavLink>
             </div>
 
@@ -95,11 +101,17 @@ const Navbar = () => {
           <NavLink onClick={handleLinkClick} to="/service" className={linkClass}>
             Services
           </NavLink>
+          <NavLink onClick={handleLinkClick} to="/event" className={linkClass}>
+            Event
+          </NavLink>
           <NavLink onClick={handleLinkClick} to="/about" className={linkClass}>
             About
           </NavLink>
           <NavLink onClick={handleLinkClick} to="/contact" className={linkClass}>
             Contact
+          </NavLink>
+          <NavLink onClick={handleLinkClick} to="/blogs" className={linkClass}>
+            Blogs
           </NavLink>
         </div>
       </div>
