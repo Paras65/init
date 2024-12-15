@@ -49,7 +49,12 @@ const Homepage = () => {
   }, []);
 
   if (isLoading) {
-    return <div>Loading...</div>; // Show a loading state
+    return <div className="loading-overlay">
+    <div className="loading-container">
+      <div className="loading-spinner"></div>
+      <p className="loading-message">Loading...</p>
+    </div>
+  </div>; // Show a loading state
   }
 
   return (
