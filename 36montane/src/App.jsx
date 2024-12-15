@@ -15,6 +15,7 @@ import Detail from'./components/Detail';
 import Tripdetail from './components/Tripdetail';
 import Gallery from './components/Gallery';
 
+
 const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -26,10 +27,11 @@ const App = () => {
         <Route path='/book' element={<Booking />} />
         <Route path='/Contact' element={<Contact />} />
         <Route path='/Detail' element={<Detail />} />
-        <Route path='/tripdetail' element={<Tripdetail />} />
+        <Route path='/tripdetail/:id' element={<Tripdetail />} />
         <Route path='/*' element={<NotFoundPage />} />
        
       </Route>
+      
     )
   );
 

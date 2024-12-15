@@ -7,6 +7,8 @@ const cors = require('cors');
 //const bcrypt = require('bcryptjs');
 //const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const featuredTripsRouter =require('./routes/featureTrips')
+const featuredServiceRouter =require('./routes/featureService')
 
 dotenv.config();
 
@@ -27,23 +29,14 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => console.log('MongoDB Connected'))
 .catch(err => console.error(err));
 
-// Define Mongoose Schemas
-const UserSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    password: {
-        type: String,
-        required: true
-    }
-});
+
 
 
 
 const Trip = require('./models/Trip');
 const Booking = require('./models/Booking');
+const Gallery = require('./models/Gallery');
+
 
 // Helper functions
 const generateToken = (id) => {
@@ -115,17 +108,34 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get('/trips', async (req, res) => {
+app.get('/trips/:id', async (req, res) => {
+    const tripId = req.params.id;
+
+    // Check if the provided id is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(tripId)) {
+        return res.status(400).json({ message: 'Invalid trip ID format. Must be a valid ObjectId' });
+    }
+
+    console.log('GET request for trip with ID:', tripId);
+
     try {
-        console.log('get request')
-        const trips = await Trip.find( { "title": "Mountain Adventure Trip"}).exec(); 
-        console.log('sucessfully got',trips)
-        res.json(trips);
+        // Find the trip by its valid ID
+        const trip = await Trip.findById(tripId).exec();
+
+        // Check if the trip exists
+        if (!trip) {
+            return res.status(404).json({ message: 'Trip not found' });
+        }
+
+        console.log('Successfully retrieved trip:', trip);
+        res.json(trip); // Send back the found trip
     } catch (err) {
-        console.log(err);
-        res.status(500).send('Server Error');
+        console.error('Error fetching trip:', err);
+        res.status(500).json({ error: 'Internal Server Error' }); // More detailed error
     }
 });
+
+
 
 app.post('/trips', async (req, res) => {
     console.log('tripcreated ',req.body)
@@ -168,6 +178,61 @@ app.post('/api/booking', async (req, res) => {
       res.status(500).json({ error: 'Failed to create booking' });
     }
   });
+
+
+
+  app.get('/api/gallery/', async (req, res) => {
+    const { type } = req.query;  // Optional filter for media type (video or photo)
+  
+    // Validate the filter type
+    if (type && !['video', 'photo'].includes(type)) {
+      return res.status(400).json({ message: 'Invalid media type.' });
+    }
+  
+    try {
+      // Fetch trips data from MongoDB
+      const filter = type ? { type } : {}; // Filter if type is provided
+      const trips = await Gallery.find(filter);  // Fetch trips based on filter
+  
+      res.json(trips);  // Return the list of trips
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching trips data.' });
+    }
+  });
+
+
+  app.post('/api/gallery/type',  async (req, res) => {
+    const { title, mediaUrl, thumbnail, type, platform } = req.body;
+  
+    // Input validation
+    if (!title || !mediaUrl || !thumbnail || !type) {
+      return res.status(400).json({ message: 'All fields (title, mediaUrl, thumbnail, type) are required.' });
+    }
+  
+    if (!['video', 'photo'].includes(type)) {
+      return res.status(400).json({ message: 'Type must be either "video" or "photo".' });
+    }
+  
+    try {
+      // Create a new trip instance
+      const newTrip = new Gallery({
+        title,
+        mediaUrl,
+        thumbnail,
+        type,
+        platform: platform || null, // Platform is optional
+      });
+  
+      // Save the new trip to the database
+      const savedTrip = await newTrip.save();
+  
+      res.status(201).json(savedTrip);  // Respond with the created trip
+    } catch (error) {
+      res.status(500).json({ message: 'Error saving trip data.' });
+    }
+  });
+
+  app.use('/api', featuredTripsRouter,featuredServiceRouter)
 
 // Start Server
 app.listen(port, () => {

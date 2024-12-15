@@ -1,109 +1,130 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import "../style/Recenttrips.css";
 
-// Sample data with both videos and photos
+//Default fallback data
 const recentTripsData = [
-  { 
-    id: 1, 
-    title: "Trip to Paris", 
-    mediaUrl: "https://www.youtube.com/embed/krhFY8LTWRs", // YouTube video URL
-    thumbnail: "https://picsum.photos/500/300?random=1",
-    type: "video", // Video type
-    platform: "youtube", // Platform for video
+  {
+    id: 1,
+    title: "Paris Trip",
+    mediaUrl: "https://www.youtube.com/embed/xyz123",
+    thumbnail: "https://example.com/paris-thumbnail.jpg",
+    type: "video",
+    platform: "youtube",
   },
-  { 
-    id: 2, 
-    title: "Hiking in the Alps", 
-    mediaUrl: "https://www.youtube.com/embed/lZVDV3rCs9g", // YouTube video URL
-    thumbnail: "https://picsum.photos/500/300?random=2",
-    type: "video", // Video type
-    platform: "youtube", // Platform for video
+  {
+    id: 2,
+    title: "Beach Sunset",
+    mediaUrl: "https://example.com/beach-photo.jpg",
+    thumbnail: "https://example.com/beach-thumbnail.jpg",
+    type: "photo",
+    platform: "instagram",
   },
-  { 
-    id: 3, 
-    title: "Beach Vibes in Bali", 
-    mediaUrl: "https://www.instagram.com/p/CVtWQ-vFZzw/embed", // Instagram reel URL
-    thumbnail: "https://picsum.photos/500/300?random=3",
-    type: "video", // Video type
-    platform: "instagram", // Platform for video
-  },
-  { 
-    id: 4, 
-    title: "Sunset at the Beach", 
-    mediaUrl: "https://picsum.photos/500/300?random=4", // Photo URL
-    thumbnail: "https://picsum.photos/500/300?random=4",
-    type: "photo", // Photo type
-  },
-  { 
-    id: 5, 
-    title: "Mountain Adventure", 
-    mediaUrl: "https://picsum.photos/500/300?random=5", // Photo URL
-    thumbnail: "https://picsum.photos/500/300?random=5",
-    type: "photo", // Photo type
-  },
+  // Add more trips here for testing
 ];
 
-const RecentTrips = () => {
-  const [playingMedia, setPlayingMedia] = useState(null); // To store the media URL that is being played
-  const [visible, setVisible] = useState(new Array(recentTripsData.length).fill(true)); // Make sure all thumbnails are visible
-  const [filter, setFilter] = useState("all"); // Filter state to manage video/photo categories
+const API_URL = `${import.meta.env.VITE_API_URL}/api/gallery/type`;
 
+const MediaCard = ({ trip, onPlay, visible }) => (
+  <div key={trip.id} className="media-card">
+    <div className="media-thumbnail-container">
+      {visible ? (
+        <img
+          className="media-thumbnail"
+          src={trip.thumbnail}
+          alt={`Thumbnail for ${trip.title}`}
+          onClick={() => onPlay(trip.mediaUrl)}
+          loading="lazy"
+        />
+      ) : (
+        <div className="thumbnail-placeholder">Loading...</div>
+      )}
+    </div>
+    <h3 className="media-title">{trip.title}</h3>
+    <button
+      className="play-button"
+      onClick={(e) => {
+        e.preventDefault();
+        onPlay(trip.mediaUrl);
+      }}
+      aria-label={`View ${trip.title}`}
+    >
+      {trip.type === "video" && <span className="play-icon">▶</span>}
+      {trip.type === "video" ? "Play Video" : "View Photo"}
+    </button>
+  </div>
+);
+
+const RecentTrips = () => {
+  const [tripsData, setTripsData] = useState(null);
+  const [playingMedia, setPlayingMedia] = useState(null);
+  const [visible, setVisible] = useState([]);
+  const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
   const observerRef = useRef(null);
 
-  // Handle play media (video or photo)
-  const handlePlayMedia = (mediaUrl) => {
-    setPlayingMedia(mediaUrl);
-  };
-
-  // Handle close media player
-  const handleCloseMedia = () => {
-    setPlayingMedia(null);
-  };
+  // Fetch trips data from API
+  useEffect(() => {
+    const fetchTripsData = async () => {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error("Failed to fetch data");
+        const data = await response.json();
+        setTripsData(data);
+        setVisible(new Array(data.length).fill(true));
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setTripsData(recentTripsData);
+        setLoading(false);
+        setShowPopup(true);
+      }
+    };
+    fetchTripsData();
+  }, []);
 
   // Lazy load thumbnails using Intersection Observer
   useEffect(() => {
-    const options = {
-      root: null, // Relative to viewport
-      rootMargin: "0px",
-      threshold: 0.1, // Load image when 10% is visible
-    };
-
-    if (!observerRef.current) {
-      observerRef.current = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-          if (entry.isIntersecting) {
-            setVisible((prevState) => {
-              const newState = [...prevState];
-              newState[index] = true; // Set only the visible thumbnail index
-              return newState;
-            });
-          }
-        });
-      }, options);
-    }
-
-    // Observe the images
-    const imgElements = document.querySelectorAll(".media-thumbnail");
-    imgElements.forEach((img) => observerRef.current.observe(img));
-
-    // Cleanup the observer on component unmount
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
+    const fetchTripsData = async () => {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error("Failed to fetch data");
+        const data = await response.json();
+        setTripsData(data);
+        setVisible(new Array(data.length).fill(true));
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setTripsData(recentTripsData); // Fallback data
+        setLoading(false);
+        setShowPopup(true); // Show the error popup
       }
     };
+    fetchTripsData();
   }, []);
+  
 
-  // Handle category filtering (All, Video, Photo)
+  // Filter trips data based on category
   const handleFilterChange = (category) => {
     setFilter(category);
   };
 
-  // Filter data based on selected category
-  const filteredData = recentTripsData.filter((trip) => {
+  const filteredData = tripsData?.filter((trip) => {
     if (filter === "all") return true;
     return trip.type === filter;
   });
+
+  // Fallback UI logic
+  if (loading) return (
+    <div className="loading-overlay">
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p className="loading-message">Loading...</p>
+      </div>
+    </div>
+  );
+  
 
   return (
     <div className="recent-trips-container">
@@ -111,75 +132,40 @@ const RecentTrips = () => {
 
       {/* Category Filter */}
       <div className="filter-buttons">
-        <button
-          onClick={() => handleFilterChange("all")}
-          className={`filter-button ${filter === "all" ? "active" : ""}`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => handleFilterChange("video")}
-          className={`filter-button ${filter === "video" ? "active" : ""}`}
-        >
-          Videos
-        </button>
-        <button
-          onClick={() => handleFilterChange("photo")}
-          className={`filter-button ${filter === "photo" ? "active" : ""}`}
-        >
-          Photos
-        </button>
-      </div>
-
-      <div className="media-grid">
-        {filteredData.map((trip, index) => (
-          <div key={trip.id} className="media-card">
-            <div className="media-thumbnail-container">
-              {visible[index] ? (
-                <img
-                  className="media-thumbnail"
-                  src={trip.thumbnail}
-                  alt={`Thumbnail for ${trip.title}`}
-                  onClick={() => handlePlayMedia(trip.mediaUrl)}
-                  loading="lazy" // Lazy load image to improve performance
-                />
-              ) : (
-                <div className="thumbnail-placeholder">Loading...</div>
-              )}
-            </div>
-            <h3 className="media-title">{trip.title}</h3>
-
-           
-
-            <button
-              className="play-button"
-              onClick={(e) => {
-                e.preventDefault();
-                handlePlayMedia(trip.mediaUrl);
-              }}
-              aria-label={`View ${trip.title}`}
-            >
-            
-              {trip.type === "video" ?  <span className="play-icon">▶</span> : ""}
-              {trip.type === "video" ? "Play Video" : "View Photo"}
-            </button>
-          </div>
+        {["all", "video", "photo"].map((category) => (
+          <button
+            key={category}
+            onClick={() => handleFilterChange(category)}
+            className={`filter-button ${filter === category ? "active" : ""}`}
+          >
+            {category.charAt(0).toUpperCase() + category.slice(1)}
+          </button>
         ))}
       </div>
 
-      {/* Display media player if a media is being played */}
+      {/* Media Grid */}
+      <div className="media-grid">
+        {filteredData?.map((trip, index) => (
+          <MediaCard
+            key={trip.id}
+            trip={trip}
+            onPlay={setPlayingMedia}
+            visible={visible[index]}
+          />
+        ))}
+      </div>
+
+      {/* Media Player */}
       {playingMedia && (
         <div className="media-player-overlay">
           <div className="media-player-container">
             <button
               className="close-button"
-              onClick={handleCloseMedia}
+              onClick={() => setPlayingMedia(null)}
               aria-label="Close media player"
             >
               X
             </button>
-
-            {/* Check if the playing media is video or photo */}
             {playingMedia.includes("youtube") || playingMedia.includes("instagram") ? (
               <iframe
                 width="100%"
@@ -191,15 +177,26 @@ const RecentTrips = () => {
                 title="Media player"
               ></iframe>
             ) : (
-              <img
-                src={playingMedia}
-                alt="Full-size view"
-                className="full-size-photo"
-              />
+              <img src={playingMedia} alt="Full-size view" className="full-size-photo" />
             )}
           </div>
         </div>
       )}
+
+      {/* Error Popup */}
+      {showPopup && (
+  <div className="popup-overlay">
+    <div className="popup-container">
+      <h2>Oops! Something went wrong.</h2>
+      <p>We couldn't fetch the latest trips from the server. Here’s some default content:</p>
+      
+      <button className="close-popup-button" onClick={() => setShowPopup(false)}>
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
