@@ -1,0 +1,45 @@
+.card-trip {
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
+  }
+  
+  .card-trip:hover {
+    transform: scale(1.05);
+  }
+  
+  .card-trip img {
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .card-trip .location {
+    color: #2196F3;
+    font-weight: bold;
+  }
+  
+  .card-trip .duration {
+    color: #757575;
+  }
+
+  .card-service {
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  .card-service:hover {
+    transform: scale(1.05);
+  }
+  
+  .card-service .icon {
+    font-size: 2rem;
+    color: #4CAF50;
+  }
+  
+  .card-service .price {
+    color: #388E3C;
+    font-weight: bold;
+  }
+  
+  
