@@ -10,6 +10,8 @@ const Contact = () => {
 
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,21 +22,43 @@ const Contact = () => {
     const newErrors = {};
     if (!formData.name) newErrors.name = "Name is required";
     if (!formData.email) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid";
     if (!formData.message) newErrors.message = "Message is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      setSubmitted(true);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        message: "",
+
+    // Validate the form
+    if (!validateForm()) return;
+
+    // Set loading state to true
+    setLoading(true);
+    setApiError(""); // Reset any previous API errors
+
+    try {
+      // Example of a POST request to an API
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message, please try again later.");
+      }
+
+      // Reset form and show success message
+      setSubmitted(true);
+      setFormData({ name: "", email: "", phone: "", message: "" });
+    } catch (error) {
+      setApiError(error.message); // Set API error message
+    } finally {
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -48,6 +72,12 @@ const Contact = () => {
           {submitted && (
             <div className="mb-6 text-center text-green-400 font-semibold">
               <p>Your message has been sent successfully!</p>
+            </div>
+          )}
+
+          {apiError && (
+            <div className="mb-6 text-center text-red-400 font-semibold">
+              <p>{apiError}</p>
             </div>
           )}
 
@@ -127,8 +157,9 @@ const Contact = () => {
               <button
                 type="submit"
                 className="px-12 py-4 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+                disabled={loading}
               >
-                Send Message
+                {loading ? "Sending..." : "Send Message"}
               </button>
             </div>
           </form>
