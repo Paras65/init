@@ -1,61 +1,55 @@
-import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHiking } from '@fortawesome/free-solid-svg-icons';
+import "../style/Navbar.css";
+
+// Define link styles for active/inactive states outside the component
+const linkClass = ({ isActive }) =>
+  isActive
+    ? "text-white bg-gradient-to-r from-gray-600 via-gray-700 to-gray-600 px-3 py-2 rounded-lg text-lg font-medium transition-all duration-300 ease-in-out"
+    : "text-gray-300 hover:bg-gray-600 hover:text-white px-3 py-2 rounded-lg text-lg font-medium transition-all duration-300 ease-in-out";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Define link styles for active/inactive states
-  const linkClass = ({ isActive }) =>
-    isActive
-      ? 'text-white bg-gradient-to-r from-gray-600 via-gray-700 to-gray-600 px-3 py-2 rounded-lg text-lg font-medium transition-all duration-300 ease-in-out'
-      : 'text-gray-300 hover:bg-gray-600 hover:text-white px-3 py-2 rounded-lg text-lg font-medium transition-all duration-300 ease-in-out';
+  // Links data
+  const links = [
+    { to: '/home', label: 'Home' },
+    { to: '/gallery', label: 'Gallery' },
+    { to: '/service', label: 'Services' },
+    { to: '/event', label: 'Events' },
+    { to: '/about', label: 'About' },
+    { to: '/contact', label: 'Contact' },
+    { to: '/blogs', label: 'Blogs' },
+  ];
 
   // Toggle mobile menu
-  const toggleMenu = () => setIsOpen(!isOpen);
+  const toggleMenu = () => setIsOpen(prev => !prev);
 
   // Close mobile menu when a link is clicked
   const handleLinkClick = () => setIsOpen(false);
 
   return (
-    <nav className="bg-gray-800 shadow-lg sticky top-0 z-50">
+    <nav className="bg-gray-800 sticky top-0 z-50">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo and Title */}
           <div className="flex flex-1 items-center justify-between md:items-stretch md:justify-start">
             <NavLink className="flex flex-shrink-0 items-center mr-4 group" to="/home">
-              <img
-                className="h-10 w-auto transition-all duration-300 ease-in-out group-hover:scale-105"
-                src="https://cbbstwltufvzpsqvnahz.supabase.co/storage/v1/object/public/avatars/public/logoipsum.png"
-                alt="36 Montane"
-              />
-              <span className="hidden md:block text-white text-2xl font-semibold ml-2 transition-all duration-300 ease-in-out group-hover:text-gray-400">
+              <span className="flex items-center text-orange-500 text-4xl font-extrabold tracking-widest ml-2">
+                <FontAwesomeIcon icon={faHiking} className="mr-2" />
                 36 Montane
               </span>
             </NavLink>
 
             {/* Desktop Links */}
             <div className="hidden md:flex space-x-8 ml-auto">
-              <NavLink to="/home" className={linkClass}>
-                Home
-              </NavLink>
-              <NavLink to="/gallery" className={linkClass}>
-                Gallery
-              </NavLink>
-              <NavLink to="/service" className={linkClass}>
-                Services
-              </NavLink>
-              <NavLink to="/event" className={linkClass}>
-                Events
-              </NavLink>
-              <NavLink to="/about" className={linkClass}>
-                About
-              </NavLink>
-              <NavLink to="/contact" className={linkClass}>
-                Contact
-              </NavLink>
-              <NavLink to="/blogs" className={linkClass}>
-                Blogs
-              </NavLink>
+              {links.map(({ to, label }) => (
+                <NavLink key={to} to={to} className={linkClass}>
+                  {label}
+                </NavLink>
+              ))}
             </div>
 
             {/* Mobile Hamburger Menu */}
@@ -63,7 +57,9 @@ const Navbar = () => {
               <button
                 onClick={toggleMenu}
                 className="text-white focus:outline-none"
-                aria-label="Toggle menu"
+                aria-label={isOpen ? "Close mobile menu" : "Open mobile menu"}
+                aria-expanded={isOpen ? "true" : "false"}
+                aria-controls="mobile-menu"
               >
                 <svg
                   className="w-6 h-6"
@@ -86,33 +82,23 @@ const Navbar = () => {
 
         {/* Mobile Links */}
         <div
-          className={`md:hidden bg-gray-700 p-6 space-y-4 transition-all duration-300 ease-in-out ${
-            isOpen ? 'block' : 'hidden'
-          }`}
+          id="mobile-menu"
+          className={`md:hidden bg-transparent p-6 space-y-2 transition-all duration-300 ease-in-out ${
+            isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+          } overflow-hidden`}
         >
-          <NavLink onClick={handleLinkClick} to="/home" className={linkClass}>
-            Home
-          </NavLink>
-          
-          <NavLink onClick={handleLinkClick} to="/gallery" className={linkClass}>
-            Gallery
-          </NavLink>
-
-          <NavLink onClick={handleLinkClick} to="/service" className={linkClass}>
-            Services
-          </NavLink>
-          <NavLink onClick={handleLinkClick} to="/event" className={linkClass}>
-            Event
-          </NavLink>
-          <NavLink onClick={handleLinkClick} to="/about" className={linkClass}>
-            About
-          </NavLink>
-          <NavLink onClick={handleLinkClick} to="/contact" className={linkClass}>
-            Contact
-          </NavLink>
-          <NavLink onClick={handleLinkClick} to="/blogs" className={linkClass}>
-            Blogs
-          </NavLink>
+          <div className="flex flex-col items-start">
+            {links.map(({ to, label }) => (
+              <NavLink
+                key={to}
+                onClick={handleLinkClick}
+                to={to}
+                className={linkClass}
+              >
+                {label}
+              </NavLink>
+            ))}
+          </div>
         </div>
       </div>
     </nav>

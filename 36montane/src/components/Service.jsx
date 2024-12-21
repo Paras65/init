@@ -3,6 +3,9 @@ import { FaHiking, FaCampground, FaPaw, FaWater, FaSearch } from 'react-icons/fa
 import axios from 'axios';
 import LazyLoad from 'react-lazyload';
 import "../style/services.css";
+import SpinnerWithIcon  from "./SpinnerWithIcon";
+import { faHiking } from '@fortawesome/free-solid-svg-icons';
+
 
 const defaultServices = [
   {
@@ -106,49 +109,28 @@ const categories = [
   "All", "Outdoor Adventures", "Camping", "Wildlife", "Water Sports", "Cultural Tours", "Nature Tours", "Urban Tours"
 ];
 
-// ItemCard Component (Reusable for Both Services and Trips)
 const ItemCard = ({ item, type, handleBooking }) => (
   <div className="relative bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 transition duration-300">
     <LazyLoad height={200} offset={100}>
       <img src={item.image} alt={item.title} className="w-full h-48 object-cover" />
     </LazyLoad>
     <div className="p-6">
-      {/* Display Icon for Services */}
       {type === 'service' && (
         <div className="flex items-center mb-4">
           <div className="text-3xl text-green-600 mr-4">{item.icon}</div>
           <h4 className="text-xl font-semibold">{item.title}</h4>
         </div>
       )}
-      
-      {/* Display Title for Trips */}
       {type === 'trip' && (
         <h4 className="text-xl font-semibold">{item.title}</h4>
       )}
-
-      {/* Description */}
       <p className="mt-2 text-sm text-gray-700">{item.description}</p>
-
-      {/* Specific Details Based on Type */}
-      {type === 'service' && (
-        <div className="mt-4">
-          <p className="text-sm font-semibold text-green-600">Price: {item.price}</p>
-          <p className="text-sm text-gray-500">Duration: {item.duration}</p>
-          <p className="text-sm text-gray-500">Location: {item.location}</p>
-          <p className="mt-1 text-sm text-yellow-500">Rating: {item.rating} ⭐</p>
-        </div>
-      )}
-      
-      {type === 'trip' && (
-        <div className="mt-4">
-          <p className="text-sm font-semibold text-green-600">Price: {item.price}</p>
-          <p className="text-sm text-gray-500">Duration: {item.duration}</p>
-          <p className="text-sm text-gray-500">Location: {item.location}</p>
-          <p className="mt-1 text-sm text-yellow-500">Rating: {item.rating} ⭐</p>
-        </div>
-      )}
-
-      {/* Book Now Button */}
+      <div className="mt-4">
+        <p className="text-sm font-semibold text-green-600">Price: {item.price}</p>
+        <p className="text-sm text-gray-500">Duration: {item.duration}</p>
+        <p className="text-sm text-gray-500">Location: {item.location}</p>
+        <p className="mt-1 text-sm text-yellow-500">Rating: {item.rating} ⭐</p>
+      </div>
       <button
         onClick={() => handleBooking(type, item.title)}
         className="mt-4 inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-300"
@@ -159,11 +141,13 @@ const ItemCard = ({ item, type, handleBooking }) => (
   </div>
 );
 
+
 const ServicesAndTrips = () => {
   const [services, setServices] = useState(defaultServices);
   const [trips, setTrips] = useState(defaultTrips);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -175,13 +159,13 @@ const ServicesAndTrips = () => {
       setError(null);
       const servicesResponse = await axios.get(`/api/services`, {
         params: {
-          search: searchQuery,
+          search: debouncedSearchQuery,
           category: selectedCategory !== 'All' ? selectedCategory : '',
         }
       });
       const tripsResponse = await axios.get(`/api/trips`, {
         params: {
-          search: searchQuery,
+          search: debouncedSearchQuery,
           category: selectedCategory !== 'All' ? selectedCategory : '',
         }
       });
@@ -197,16 +181,23 @@ const ServicesAndTrips = () => {
   };
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500); // 500ms debounce delay
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
     fetchData();
-  }, [searchQuery, selectedCategory]);
+  }, [debouncedSearchQuery, selectedCategory]);
 
   const filteredServices = selectedCategory === "All"
-    ? services.filter(service => service.title.toLowerCase().includes(searchQuery.toLowerCase()) || service.description.toLowerCase().includes(searchQuery.toLowerCase()))
-    : services.filter(service => service.category === selectedCategory && (service.title.toLowerCase().includes(searchQuery.toLowerCase()) || service.description.toLowerCase().includes(searchQuery.toLowerCase())));
+    ? services.filter(service => service.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) || service.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
+    : services.filter(service => service.category === selectedCategory && (service.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) || service.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase())));
 
   const filteredTrips = selectedCategory === "All"
-    ? trips.filter(trip => trip.title.toLowerCase().includes(searchQuery.toLowerCase()) || trip.description.toLowerCase().includes(searchQuery.toLowerCase()))
-    : trips.filter(trip => trip.category === selectedCategory && (trip.title.toLowerCase().includes(searchQuery.toLowerCase()) || trip.description.toLowerCase().includes(searchQuery.toLowerCase())));
+    ? trips.filter(trip => trip.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) || trip.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
+    : trips.filter(trip => trip.category === selectedCategory && (trip.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) || trip.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase())));
 
   const handleBooking = (itemType, itemName) => {
     setBookingDetails({ ...bookingDetails, serviceOrTrip: itemType, itemName: itemName });
@@ -214,6 +205,15 @@ const ServicesAndTrips = () => {
   };
 
   const handleBookingSubmit = () => {
+    if (!bookingDetails.name || !bookingDetails.email) {
+      alert("Please fill out all the fields.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(bookingDetails.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
     alert(`Booking confirmed for ${bookingDetails.itemName} (${bookingDetails.serviceOrTrip}).`);
     setIsBookingModalOpen(false);
   };
@@ -232,7 +232,6 @@ const ServicesAndTrips = () => {
     <div className="container mx-auto px-4 py-10 bg-green-50">
       <h2 className="text-4xl font-semibold text-black text-center mb-8">Explore Services and Trips in Chhattisgarh</h2>
 
-      {/* Category Filter */}
       <div className="mb-8 text-center">
         {categories.map((category, index) => (
           <button
@@ -245,7 +244,6 @@ const ServicesAndTrips = () => {
         ))}
       </div>
 
-      {/* Search Bar with Icon */}
       <div className="mb-8 relative max-w-md mx-auto">
         <input
           type="text"
@@ -257,49 +255,58 @@ const ServicesAndTrips = () => {
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
       </div>
 
-      {/* Loading/Error States */}
-      {loading && <div className="text-center">Loading...</div>}
+      {loading && 
+      <SpinnerWithIcon icon={faHiking} size="5xl" spinnerSize="w-24 h-24" />}
       {error && <div className="text-center text-red-600">{error}</div>}
+      {noDataFound && <div className="text-center text-gray-500">No services or trips found for the selected category. Try different keywords or clear filters.</div>}
 
-      {/* No Data Found */}
-      {noDataFound && <div className="text-center text-gray-500">No services or trips found for the selected category.</div>}
-
-      {/* Services & Trips Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {filteredServices.map((service, index) => (
-          <ItemCard key={index} item={service} type="service" handleBooking={handleBooking} />
+        {filteredServices.map((service) => (
+          <ItemCard key={service.title} item={service} type="service" handleBooking={handleBooking} />
         ))}
-        {filteredTrips.map((trip, index) => (
-          <ItemCard key={index} item={trip} type="trip" handleBooking={handleBooking} />
+        {filteredTrips.map((trip) => (
+          <ItemCard key={trip.title} item={trip} type="trip" handleBooking={handleBooking} />
         ))}
       </div>
 
-      {/* Booking Modal */}
       {isBookingModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl font-semibold mb-4">Booking {bookingDetails.serviceOrTrip}</h3>
-            <p className="mb-4">You are booking: {bookingDetails.itemName}</p>
-            <input
-              type="text"
-              name="name"
-              value={bookingDetails.name}
-              onChange={handleChange}
-              placeholder="Your Name"
-              className="w-full px-4 py-2 mb-4 border border-green-500 rounded"
-            />
-            <input
-              type="email"
-              name="email"
-              value={bookingDetails.email}
-              onChange={handleChange}
-              placeholder="Your Email"
-              className="w-full px-4 py-2 mb-4 border border-green-500 rounded"
-            />
-            <div className="flex justify-between">
-              <button onClick={handleModalClose} className="px-4 py-2 bg-gray-300 text-gray-700 rounded">Cancel</button>
-              <button onClick={handleBookingSubmit} className="px-4 py-2 bg-green-600 text-white rounded">Confirm Booking</button>
-            </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg w-96">
+            <h3 className="text-2xl mb-4">Booking for {bookingDetails.itemName}</h3>
+            <form>
+              <input
+                type="text"
+                name="name"
+                placeholder="Your Name"
+                value={bookingDetails.name}
+                onChange={handleChange}
+                className="w-full p-2 mb-4 border border-gray-300 rounded"
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Your Email"
+                value={bookingDetails.email}
+                onChange={handleChange}
+                className="w-full p-2 mb-4 border border-gray-300 rounded"
+              />
+              <div className="flex justify-between">
+                <button
+                  type="button"
+                  onClick={handleModalClose}
+                  className="px-4 py-2 bg-gray-300 rounded"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBookingSubmit}
+                  className="px-4 py-2 bg-green-600 text-white rounded"
+                >
+                  Confirm Booking
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

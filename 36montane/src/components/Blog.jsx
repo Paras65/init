@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faTwitter, faLinkedin } from '@fortawesome/free-brands-svg-icons';
+import { faHiking } from '@fortawesome/free-solid-svg-icons';
 import { Puff } from 'react-loading-icons';  // Add loading spinner package
 
 // Styled components
@@ -254,9 +255,20 @@ const BlogDetail = () => {
   return (
     <>
       {loading ? (
-        <SpinnerContainer>
-          <Puff stroke="#007bff" />
-        </SpinnerContainer>
+    <SpinnerContainer className="flex flex-col items-center justify-center h-full space-y-4 relative p-8">
+    <FontAwesomeIcon 
+      icon={faHiking} 
+      className="text-orange-600 text-4xl relative z-10"  // Orange icon
+    />
+    <Puff 
+      stroke="#FFA500"  // Orange spinner
+      className="w-20 h-20 absolute z-0" // Increased spinner size
+    />
+  </SpinnerContainer>
+  
+     
+     
+        
       ) : error ? (
         <p>Error loading blogs. Showing default content.</p>
       ) : (
