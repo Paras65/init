@@ -3,6 +3,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
   RouterProvider,
+  Navigate 
 } from 'react-router-dom';
 import MainLayout from "./layouts/MainLayout";
 import NotFoundPage from './pages/NotFoundPage';
@@ -23,6 +24,7 @@ const App = () => {
     createRoutesFromElements(
       <Route path='/' element={<MainLayout />}>
         <Route path='/home' element={<Home />} />
+        <Route path='/' element={<Navigate to="/home" />} />
         <Route path='/gallery' element={<Gallery />} />
         <Route path='/service' element={<Service />} />
         <Route path='/event' element={<Event />} />

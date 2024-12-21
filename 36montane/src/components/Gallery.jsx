@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import "../style/Recenttrips.css";
+import SpinnerWithIcon  from "./SpinnerWithIcon";
+import { faHiking } from '@fortawesome/free-solid-svg-icons';
 
 //Default fallback data
 const recentTripsData = [
@@ -117,12 +119,8 @@ const RecentTrips = () => {
 
   // Fallback UI logic
   if (loading) return (
-    <div className="loading-overlay">
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p className="loading-message">Loading...</p>
-      </div>
-    </div>
+    <SpinnerWithIcon icon={faHiking} size="5xl" spinnerSize="w-24 h-24" />
+
   );
   
 

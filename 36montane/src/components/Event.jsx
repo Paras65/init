@@ -3,6 +3,8 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { format, isBefore, addMinutes } from 'date-fns';
 import { CircularProgress } from '@mui/material';
+import SpinnerWithIcon  from "./SpinnerWithIcon";
+import { faHiking } from '@fortawesome/free-solid-svg-icons';
 
 const EventPage = () => {
   const [events, setEvents] = useState([]);
@@ -160,10 +162,10 @@ END:VCALENDAR`;
         <section className="w-full md:w-2/3">
           {/* Loading or error states */}
           {loading && (
-            <div className="loading-container text-center">
-              <CircularProgress className="loading-spinner" />
-              <p className="loading-message">Loading events...</p>
-            </div>
+            
+              <SpinnerWithIcon icon={faHiking} size="5xl" spinnerSize="w-24 h-24" />
+        
+            
           )}
 
           {error && !loading && (

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom"; // Import Link to navigate between pages
 import FAQComponent from "./Faq";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import SpinnerWithIcon  from "./SpinnerWithIcon";
+import { faHiking } from '@fortawesome/free-solid-svg-icons';
 import {
   faMapMarkerAlt,
   faMountain,
@@ -65,12 +67,8 @@ const Homepage = () => {
   // Display loading state
   if (isLoading) {
     return (
-      <div className="loading-overlay">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p className="loading-message">Loading...</p>
-        </div>
-      </div>
+      <SpinnerWithIcon icon={faHiking} size="5xl" spinnerSize="w-24 h-24" />
+
     );
   }
 
