@@ -157,7 +157,7 @@ const ServicesAndTrips = () => {
     try {
       setLoading(true);
       setError(null);
-      const servicesResponse = await axios.get(`/api/services`, {
+      const servicesResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/services`, {
         params: {
           search: debouncedSearchQuery,
           category: selectedCategory !== 'All' ? selectedCategory : '',
