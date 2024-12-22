@@ -1,5 +1,5 @@
 {
-  "homepage": "https://paras65.github.io/init",
+  
   "name": "36montane",
   "private": true,
   "version": "0.0.0",
@@ -13,6 +13,7 @@
     "preview": "vite preview"
     
   },
+  "homepage": "https://paras65.github.io/init",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.1",
