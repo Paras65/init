@@ -163,7 +163,7 @@ const ServicesAndTrips = () => {
           category: selectedCategory !== 'All' ? selectedCategory : '',
         }
       });
-      const tripsResponse = await axios.get(`/api/trips`, {
+      const tripsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/services`, {
         params: {
           search: debouncedSearchQuery,
           category: selectedCategory !== 'All' ? selectedCategory : '',
