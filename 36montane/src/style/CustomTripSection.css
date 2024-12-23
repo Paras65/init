@@ -1,0 +1,158 @@
+/* CustomTripSection.css */
+
+/* Container styling */
+/* .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  } */
+  
+  /* Modal Overlay */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    display: block;
+    z-index: 999;
+    overflow-y: auto;
+    transition: opacity 0.3s ease; /* Smooth transition */
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    position: relative;
+    margin: auto;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%; /* Default width for mobile */
+    max-width: 600px; /* Max width for larger screens */
+  }
+  
+  /* Close button in the modal */
+  
+  /* Heading */
+  h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Form Card Styling */
+  .form-card {
+    background-color: rgba(192, 192, 192, 0.5); /* Silver with 50% transparency */
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 2rem;
+  }
+  
+  /* Form Field Styling */
+  .form-field {
+    margin-bottom: 1.25rem;
+  }
+  
+  .label {
+    display: block;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .select,
+  .input,
+  .textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    color: #333;
+  }
+  
+  .select:focus,
+  .input:focus,
+  .textarea:focus {
+    border-color: #4b8cfc;
+    outline: none;
+    box-shadow: 0 0 5px rgba(75, 140, 252, 0.6); /* Subtle glow on focus */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+  }
+  
+  /* Activities List */
+  .activities-list {
+    margin-top: 0.5rem;
+  }
+  
+  .activity-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0; /* Added padding for better spacing */
+  }
+  
+  .checkbox {
+    margin-right: 1rem;
+    width: 20px;
+    height: 20px; /* Adjusted checkbox size */
+  }
+  
+  .activity-label {
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  /* Submit Button */
+  .submit-button {
+    width: 100%;
+    padding: 1.25rem;
+    background-color: #3b82f6; /* Blue */
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Added transition for box-shadow */
+    font-size: 1.125rem;
+  }
+  
+  .submit-button:hover {
+    background-color: #2563eb; /* Darker blue */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds shadow on hover */
+  }
+  
+  .submit-button:focus {
+    outline: none;
+  }
+  
+  /* Input Number Styling */
+  .input[type="number"] {
+    appearance: none;
+    -moz-appearance: textfield;
+    -webkit-appearance: none; /* Hides increment/decrement arrows */
+  }
+  
+  .input[type="number"]::-webkit-outer-spin-button,
+  .input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* Hides increment/decrement arrows in Chrome/Safari */
+    margin: 0;
+  }
+  
+  /* Mobile responsiveness adjustments */
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 1.5rem; /* Smaller heading size for small screens */
+    }
+    .form-card {
+      padding: 1.5rem; /* Reduced padding for mobile */
+    }
+    .submit-button {
+      font-size: 1rem; /* Smaller font size for the submit button */
+    }
+  }
+  
+
+  
