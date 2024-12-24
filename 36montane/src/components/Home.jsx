@@ -200,9 +200,9 @@ const Homepage = () => {
       </section>
 
       {/* FAQ Section */}
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <FAQComponent />
-      </div>
+      <div className="bg-gray-100 flex items-center justify-center py-10">
+  <FAQComponent />
+</div>
     </div>
   );
 };
