@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const BookingDetail = () => {
   // Initial form data and trip details state
@@ -41,34 +43,123 @@ const BookingDetail = () => {
     updateTotalPrice();
   }, [formData.groupSize]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
+  // Validate form data
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name) newErrors.name = "Name is required";
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.phone) newErrors.phone = "Phone number is required";
-    if (!formData.date) newErrors.date = "Please select a date";
+
+    // Name Validation
+    if (!formData.name) {
+      newErrors.name = "Name is required";
+    }
+
+    // Email Validation
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Phone Validation
+    if (!formData.phone) {
+      newErrors.phone = "Phone number is required";
+    } else if (!validatePhone(formData.phone)) {
+      newErrors.phone = "Please enter a valid phone number";
+    }
+
+    // Date Validation
+    if (!formData.date) {
+      newErrors.date = "Please select a date";
+    }
+
+    // Group Size Validation
+    if (!formData.groupSize) {
+      newErrors.groupSize = "Please select a group size";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // Validate email format
+  const validateEmail = (email) => {
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return emailPattern.test(email);
+  };
+
+  // Validate phone number format (basic US format, adjust as needed)
+  const validatePhone = (phone) => {
+    const phonePattern = /^[2-9]{1}[0-9]{9}$/; // Simple validation for US phone numbers
+    return phonePattern.test(phone);
+  };
+
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Trigger real-time validation
+    const newErrors = { ...errors };
+
+    if (name === "name" && !value) {
+      newErrors.name = "Name is required";
+    } else {
+      delete newErrors.name;
+    }
+
+    if (name === "email") {
+      if (!value) {
+        newErrors.email = "Email is required";
+      } else if (!validateEmail(value)) {
+        newErrors.email = "Please enter a valid email address";
+      } else {
+        delete newErrors.email;
+      }
+    }
+
+    if (name === "phone") {
+      if (!value) {
+        newErrors.phone = "Phone number is required";
+      } else if (!validatePhone(value)) {
+        newErrors.phone = "Please enter a valid phone number";
+      } else {
+        delete newErrors.phone;
+      }
+    }
+
+    if (name === "date" && !value) {
+      newErrors.date = "Please select a date";
+    } else {
+      delete newErrors.date;
+    }
+
+    if (name === "groupSize" && !value) {
+      newErrors.groupSize = "Please select a group size";
+    } else {
+      delete newErrors.groupSize;
+    }
+
+    setErrors(newErrors);
+  };
+
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
       console.log("Booking Submitted:", formData);
-      alert("Your booking has been successfully submitted!");
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        groupSize: "1",
-        date: "",
+
+      const successMessage = `Booking for ${formData.name} (${formData.groupSize} people) on ${formData.date} has been successfully submitted! Total price: $${totalPrice}`;
+      toast.success(successMessage, {
+        onClose: () => {
+          setFormData({
+            name: "",
+            email: "",
+            phone: "",
+            groupSize: "1",
+            date: "",
+          });
+          setTotalPrice(tripDetails.basePrice);
+        },
       });
-      setTotalPrice(tripDetails.basePrice); // Reset price after form submission
     }
   };
 
@@ -111,7 +202,6 @@ const BookingDetail = () => {
                 onChange={handleChange}
                 className="w-full p-4 border-2 border-gray-300 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-green-600 transition-all"
                 placeholder="Enter your full name"
-                required
               />
               {errors.name && <p className="text-red-500 text-sm mt-2">{errors.name}</p>}
             </div>
@@ -129,7 +219,6 @@ const BookingDetail = () => {
                 onChange={handleChange}
                 className="w-full p-4 border-2 border-gray-300 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-green-600 transition-all"
                 placeholder="Enter your email address"
-                required
               />
               {errors.email && <p className="text-red-500 text-sm mt-2">{errors.email}</p>}
             </div>
@@ -147,7 +236,6 @@ const BookingDetail = () => {
                 onChange={handleChange}
                 className="w-full p-4 border-2 border-gray-300 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-green-600 transition-all"
                 placeholder="Enter your phone number"
-                required
               />
               {errors.phone && <p className="text-red-500 text-sm mt-2">{errors.phone}</p>}
             </div>
@@ -163,7 +251,6 @@ const BookingDetail = () => {
                 value={formData.groupSize}
                 onChange={handleChange}
                 className="w-full p-4 border-2 border-gray-300 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-green-600 transition-all"
-                required
               >
                 <option value="1">Solo</option>
                 <option value="2-5">Group of 2-5</option>
@@ -184,24 +271,23 @@ const BookingDetail = () => {
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
+                min={new Date().toISOString().split('T')[0]} // Disable past dates
                 className="w-full p-4 border-2 border-gray-300 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-green-600 transition-all"
-                required
               />
               {errors.date && <p className="text-red-500 text-sm mt-2">{errors.date}</p>}
             </div>
 
-            {/* Submit Button */}
-            <div className="flex justify-center mt-8">
-              <button
-                type="submit"
-                className="px-8 py-4 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 transition-all"
-              >
-                Confirm Booking
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="w-full bg-green-600 text-white py-3 rounded-lg mt-6 font-bold transition-all hover:bg-green-700"
+            >
+              Book Now
+            </button>
           </form>
         </div>
       </div>
+
+      <ToastContainer />
     </div>
   );
 };
