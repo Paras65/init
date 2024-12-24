@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import '../style/CustomTripSection.css'; // Import your custom styles for premium look
 import 'font-awesome/css/font-awesome.min.css'; // Font Awesome icons
+import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
+import 'react-toastify/dist/ReactToastify.css';  // Import Toastify CSS
 
 const CustomTripSection = () => {
   const [destination, setDestination] = useState('');
@@ -29,20 +31,20 @@ const CustomTripSection = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!destination) {
-      alert('Please select a destination.');
+      toast.error('Please select a destination.');
       return;
     }
     if (guestCount < 1) {
-      alert('Guest count must be at least 1.');
+      toast.error('Guest count must be at least 1.');
       return;
     }
     if (!tripStartDate || !tripEndDate) {
-      alert('Please select both start and end dates.');
+      toast.error('Please select both start and end dates.');
       return;
     }
 
     if (new Date(tripEndDate) < new Date(tripStartDate)) {
-      alert("End date cannot be earlier than the start date.");
+      toast.error("End date cannot be earlier than the start date.");
       return;
     }
 
@@ -50,7 +52,7 @@ const CustomTripSection = () => {
       .filter((activity) => activities[activity])
       .join(', ');
 
-    alert(`Booking trip to ${destination} from ${tripStartDate} to ${tripEndDate} for ${guestCount} guests.\nSelected Activities: ${selectedActivities}\nAdditional Requests: ${additionalRequests}`);
+    toast.success(`Trip booked to ${destination} from ${tripStartDate} to ${tripEndDate} for ${guestCount} guests.\nSelected Activities: ${selectedActivities}\nAdditional Requests: ${additionalRequests}`);
     
     resetForm();
   };
@@ -243,6 +245,9 @@ const CustomTripSection = () => {
           </div>
         </div>
       )}
+
+      {/* Toast container for notifications */}
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={true} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
     </div>
   );
 };

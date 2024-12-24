@@ -5,6 +5,8 @@ import LazyLoad from 'react-lazyload';
 import "../style/services.css";
 import SpinnerWithIcon from "./SpinnerWithIcon";
 import { faHiking } from '@fortawesome/free-solid-svg-icons';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Categories for filtering
 const categories = [
@@ -68,7 +70,6 @@ const ServicesAndTrips = () => {
       const response = await axios.get(`${apiUrl}/api/services`, { params });
 
       if (response.status === 200) {
-        // Assuming both services and trips are part of the same response
         const data = response?.data || [];
         setItems(data);
       } else {
@@ -117,7 +118,9 @@ const ServicesAndTrips = () => {
       return;
     }
 
-    alert(`Booking confirmed for ${bookingDetails.itemName} (${bookingDetails.serviceOrTrip}).`);
+    // Replace alert with toast notification
+    toast.success(`Booking confirmed for ${bookingDetails.itemName} (${bookingDetails.serviceOrTrip}).`);
+
     setIsBookingModalOpen(false);
     setError(null);
   };
@@ -214,6 +217,9 @@ const ServicesAndTrips = () => {
           </div>
         </div>
       )}
+
+      {/* Toast Container for notifications */}
+      <ToastContainer />
     </div>
   );
 };
