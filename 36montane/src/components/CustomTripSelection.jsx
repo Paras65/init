@@ -41,6 +41,11 @@ const CustomTripSection = () => {
       return;
     }
 
+    if (new Date(tripEndDate) < new Date(tripStartDate)) {
+      alert("End date cannot be earlier than the start date.");
+      return;
+    }
+
     const selectedActivities = Object.keys(activities)
       .filter((activity) => activities[activity])
       .join(', ');
