@@ -10,6 +10,7 @@ const EventPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [calendarStatus, setCalendarStatus] = useState(''); // For save to calendar status
 
   const defaultEvents = [
     {
@@ -74,7 +75,6 @@ const EventPage = () => {
         }
       });
 
-      // Only update state if there's a change
       setTimeLeft((prevTimeLeft) => {
         if (JSON.stringify(prevTimeLeft) !== JSON.stringify(updatedTimeLeft)) {
           return updatedTimeLeft;
@@ -84,9 +84,9 @@ const EventPage = () => {
     };
 
     const interval = setInterval(updateTimeLeft, 1000);
-    updateTimeLeft(); // Initialize immediately
+    updateTimeLeft();
 
-    return () => clearInterval(interval); // Cleanup interval
+    return () => clearInterval(interval);
   }, [events]);
 
   const today = new Date();
@@ -107,12 +107,15 @@ const EventPage = () => {
     const { eventName, date, description, location, duration } = event;
     const endDate = addMinutes(date, duration);
 
+    const formattedStartDate = format(date, 'yyyyMMdd\'T\'HHmmss');
+    const formattedEndDate = format(endDate, 'yyyyMMdd\'T\'HHmmss');
+    
     const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VEVENT
 SUMMARY:${eventName}
-DTSTART:${format(date, 'yyyyMMdd\'T\'HHmmss\'Z\'')}
-DTEND:${format(endDate, 'yyyyMMdd\'T\'HHmmss\'Z\'')}
+DTSTART:${formattedStartDate}Z
+DTEND:${formattedEndDate}Z
 DESCRIPTION:${description}
 LOCATION:${location}
 STATUS:CONFIRMED
@@ -122,10 +125,15 @@ END:VCALENDAR`;
     const blob = new Blob([icsContent], { type: 'text/calendar' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
+    
     link.href = url;
     link.download = `${eventName}_${format(date, 'MM-dd-yyyy')}.ics`;
+    
     link.click();
     URL.revokeObjectURL(url);
+
+    setCalendarStatus('success');
+    setTimeout(() => setCalendarStatus(''), 3000);  // Reset status after 3 seconds
   };
 
   const handleDateChange = (date) => {
@@ -139,174 +147,163 @@ END:VCALENDAR`;
   const retryFetch = () => {
     setError(null);
     setLoading(true);
-    setEvents([]); // Clear existing events to simulate a fresh fetch
-    // Retry fetching events
+    setEvents([]);
     fetchEvents();
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white flex flex-col">
       <header className="bg-transparent shadow-lg p-6">
-        <h1 className="text-4xl font-bold text-center text-gray-900">Upcoming Events</h1>
+        <h1 className="text-4xl font-extrabold text-center">Upcoming Events</h1>
       </header>
 
-      <main className="max-w-6xl mx-auto p-6 flex flex-col md:flex-row justify-between gap-8">
-        {/* Left Side: Calendar Section */}
-        <section className="w-full md:w-1/3 bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">Select a Date</h2>
-          <div className="flex justify-center mb-6">
-            <Calendar
-              onChange={handleDateChange}
-              value={selectedDate}
-              tileClassName="calendar-tile"
-              prevLabel={<span className="text-2xl text-blue-600">←</span>}
-              nextLabel={<span className="text-2xl text-blue-600">→</span>}
-              minDetail="month"
-              maxDetail="month"
-              tileContent={({ date, view }) => {
-                if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
-                  return <div className="text-center text-blue-600">🔵</div>;
-                }
-              }}
-            />
-          </div>
-          <div className="text-center">
-            <button
-              onClick={resetDate}
-              className="bg-blue-600 text-white px-8 py-3 rounded-md shadow-lg hover:bg-blue-700 transition duration-200 transform hover:scale-105"
-              aria-label="Reset Date"
-            >
-              Reset Date
-            </button>
-          </div>
-        </section>
+      <main className="max-w-7xl mx-auto p-6 flex flex-col md:flex-row justify-between gap-8">
 
-        {/* Right Side: Events Section */}
-        <section className="w-full md:w-2/3">
-          {/* Loading or error states */}
-          {loading && (
-            <div className="flex justify-center items-center h-full">
-              <SpinnerWithIcon icon={faHiking} size="5xl" spinnerSize="w-24 h-24" />
-            </div>
-          )}
+  {/* Event List Section */}
+  <section className="w-full md:w-2/3">
+    {loading && (
+      <div className="flex justify-center items-center h-full">
+        <SpinnerWithIcon icon={faHiking} size="5xl" spinnerSize="w-24 h-24" />
+      </div>
+    )}
 
-          {error && !loading && (
-            <div className="error-container text-center text-red-500">
-              <p>{error}</p>
-              <button
-                onClick={retryFetch}
-                className="mt-4 bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700"
+    {error && !loading && (
+      <div className="error-container text-center text-red-500">
+        <p>{error}</p>
+        <button
+          onClick={retryFetch}
+          className="mt-4 bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700"
+        >
+          Retry
+        </button>
+      </div>
+    )}
+
+    {!selectedDate && (
+      <>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Upcoming Events</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {upcomingEvents.length === 0 ? (
+            <p className="text-center text-gray-600">No upcoming events.</p>
+          ) : (
+            upcomingEvents.map((event, index) => (
+              <div
+                key={index}
+                className="bg-white text-black p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300"
               >
-                Retry
-              </button>
-            </div>
-          )}
-
-          {/* Show Upcoming Events */}
-          {!selectedDate && (
-            <>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Upcoming Events</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                {upcomingEvents.length === 0 ? (
-                  <p className="text-center text-gray-600">No upcoming events.</p>
-                ) : (
-                  upcomingEvents.map((event, index) => (
-                    <div
-                      key={index}
-                      className="bg-white text-black p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
-                    >
-                      <img
-                        src={event.image || 'https://picsum.photos/500/300'}
-                        alt={event.eventName}
-                        className="w-full h-48 object-cover rounded-lg mb-4"
-                      />
-                      <h3 className="text-xl font-semibold">{event.eventName}</h3>
-                      <p className="text-sm text-gray-500">
-                        {format(new Date(event.date), 'MM/dd/yyyy')} at {format(new Date(event.date), 'hh:mm a')}
-                      </p>
-                      <p className="mt-2 text-gray-600">{event.description}</p>
-                      <p className="mt-2 text-sm text-gray-500">Location: {event.location}</p>
-                      <div className="mt-4">
-                        <h4 className="text-lg font-bold text-gray-700">Time Left:</h4>
-                        <div className="text-3xl font-semibold">{timeLeft[event.eventName]}</div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </>
-          )}
-
-          {/* Show filtered events if a date is selected */}
-          {selectedDate && (
-            <>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-                Events for {format(selectedDate, 'MM/dd/yyyy')}
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredEvents.length === 0 ? (
-                  <p className="text-center text-gray-600">No events for this date.</p>
-                ) : (
-                  filteredEvents.map((event, index) => (
-                    <div
-                      key={index}
-                      className="bg-white text-black p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
-                    >
-                      <img
-                        src={event.image || 'https://picsum.photos/500/300'}
-                        alt={event.eventName}
-                        className="w-full h-48 object-cover rounded-lg mb-4"
-                      />
-                      <h3 className="text-xl font-semibold">{event.eventName}</h3>
-                      <p className="text-sm text-gray-500">
-                        {format(new Date(event.date), 'MM/dd/yyyy')} at {format(new Date(event.date), 'hh:mm a')}
-                      </p>
-                      <p className="mt-2 text-gray-600">{event.description}</p>
-                      <p className="mt-2 text-sm text-gray-500">Location: {event.location}</p>
-                      <div className="mt-4">
-                        <h4 className="text-lg font-bold text-gray-700">Time Left:</h4>
-                        <div className="text-3xl font-semibold">{timeLeft[event.eventName]}</div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </>
-          )}
-
-          {/* Past Events Section */}
-          <section className="mt-16">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Past Events</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {pastEvents.length === 0 ? (
-                <p className="text-center text-gray-600">No past events.</p>
-              ) : (
-                pastEvents.map((event, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-200 text-black p-6 rounded-lg shadow-lg"
+                <img
+                  src={event.image || 'https://picsum.photos/500/300'}
+                  alt={event.eventName}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
+                <h3 className="text-xl font-semibold">{event.eventName}</h3>
+                <p className="text-sm text-gray-500">
+                  {format(new Date(event.date), 'MM/dd/yyyy')} at {format(new Date(event.date), 'hh:mm a')}
+                </p>
+                <p className="mt-2 text-gray-600">{event.description}</p>
+                <p className="mt-2 text-sm text-gray-500">Location: {event.location}</p>
+                <div className="mt-4">
+                  <h4 className="text-lg font-bold text-gray-700">Time Left:</h4>
+                  <div className="text-3xl font-semibold">{timeLeft[event.eventName]}</div>
+                </div>
+                <div className="mt-4">
+                  <button
+                    onClick={() => saveToCalendar(event)}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition duration-200"
                   >
-                    <img
-                      src={event.image || 'https://picsum.photos/500/300'}
-                      alt={event.eventName}
-                      className="w-full h-48 object-cover rounded-lg mb-4"
-                    />
-                    <h3 className="text-xl font-semibold">{event.eventName}</h3>
-                    <p className="text-sm text-gray-500">
-                      {format(new Date(event.date), 'MM/dd/yyyy')} at {format(new Date(event.date), 'hh:mm a')}
-                    </p>
-                    <p className="mt-2 text-gray-600">{event.description}</p>
-                    <p className="mt-2 text-sm text-gray-500">Location: {event.location}</p>
-                    <div className="mt-4">
-                      <h4 className="text-lg font-bold text-gray-700">Event Finished</h4>
-                    </div>
-                  </div>
-                ))
-              )}
+                    Save to Calendar
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </>
+    )}
+
+    {selectedDate && (
+      <>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+          Events for {format(selectedDate, 'MM/dd/yyyy')}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredEvents.length === 0 ? (
+            <p className="text-center text-gray-600">No events for this date.</p>
+          ) : (
+            filteredEvents.map((event, index) => (
+              <div
+                key={index}
+                className="bg-white text-black p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300"
+              >
+                <img
+                  src={event.image || 'https://picsum.photos/500/300'}
+                  alt={event.eventName}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
+                <h3 className="text-xl font-semibold">{event.eventName}</h3>
+                <p className="text-sm text-gray-500">
+                  {format(new Date(event.date), 'MM/dd/yyyy')} at {format(new Date(event.date), 'hh:mm a')}
+                </p>
+                <p className="mt-2 text-gray-600">{event.description}</p>
+                <p className="mt-2 text-sm text-gray-500">Location: {event.location}</p>
+                <div className="mt-4">
+                  <h4 className="text-lg font-bold text-gray-700">Time Left:</h4>
+                  <div className="text-3xl font-semibold">{timeLeft[event.eventName]}</div>
+                </div>
+                <div className="mt-4">
+                  <button
+                    onClick={() => saveToCalendar(event)}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition duration-200"
+                  >
+                    Save to Calendar
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </>
+    )}
+
+    {calendarStatus && (
+      <div className="absolute bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-md shadow-lg transition duration-300 transform hover:scale-105">
+        Event saved to calendar!
+      </div>
+    )}
+
+    <section className="mt-16">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Past Events</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {pastEvents.length === 0 ? (
+          <p className="text-center text-gray-600">No past events.</p>
+        ) : (
+          pastEvents.map((event, index) => (
+            <div
+              key={index}
+              className="bg-gray-200 text-black p-6 rounded-lg shadow-lg"
+            >
+              <img
+                src={event.image || 'https://picsum.photos/500/300'}
+                alt={event.eventName}
+                className="w-full h-48 object-cover rounded-lg mb-4"
+              />
+              <h3 className="text-xl font-semibold">{event.eventName}</h3>
+              <p className="text-sm text-gray-500">
+                {format(new Date(event.date), 'MM/dd/yyyy')} at {format(new Date(event.date), 'hh:mm a')}
+              </p>
+              <p className="mt-2 text-gray-600">{event.description}</p>
+              <p className="mt-2 text-sm text-gray-500">Location: {event.location}</p>
+              <div className="mt-4">
+                <h4 className="text-lg font-bold text-gray-700">Event Finished</h4>
+              </div>
             </div>
-          </section>
-        </section>
-      </main>
+          ))
+        )}
+      </div>
+    </section>
+  </section>
+</main>
+
     </div>
   );
 };

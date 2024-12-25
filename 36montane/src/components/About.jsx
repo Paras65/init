@@ -84,25 +84,26 @@ const AboutUs = () => {
 
           {/* Section: Company History */}
           <div className="text-center mb-16">
-            <h3 className="text-4xl font-semibold text-gray-800 mb-8">Our History</h3>
-            <div className="relative flex items-center justify-center">
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-t-2 border-gray-300 w-full z-0"></div>
-              <div className="flex items-center justify-between space-x-8 z-10">
-                <div className="text-center">
-                  <h4 className="text-xl font-semibold text-green-600">2010</h4>
-                  <p className="text-gray-500">Founded with a vision to inspire outdoor exploration.</p>
-                </div>
-                <div className="text-center">
-                  <h4 className="text-xl font-semibold text-green-600">2015</h4>
-                  <p className="text-gray-500">Expanded to multiple locations globally.</p>
-                </div>
-                <div className="text-center">
-                  <h4 className="text-xl font-semibold text-green-600">2020</h4>
-                  <p className="text-gray-500">Launched eco-friendly camping and trekking options.</p>
-                </div>
-              </div>
-            </div>
-          </div>
+  <h3 className="text-4xl font-semibold text-gray-800 mb-8">Our History</h3>
+  <div className="relative flex items-center justify-center">
+    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-t-2 border-gray-300 w-full z-0"></div>
+    <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-8 z-10">
+      <div className="text-center mb-8 sm:mb-0">
+        <h4 className="text-xl font-semibold text-green-600">2010</h4>
+        <p className="text-gray-500">Founded with a vision to inspire outdoor exploration.</p>
+      </div>
+      <div className="text-center mb-8 sm:mb-0">
+        <h4 className="text-xl font-semibold text-green-600">2015</h4>
+        <p className="text-gray-500">Expanded to multiple locations globally.</p>
+      </div>
+      <div className="text-center">
+        <h4 className="text-xl font-semibold text-green-600">2020</h4>
+        <p className="text-gray-500">Launched eco-friendly camping and trekking options.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 
           {/* Section: Meet the Team */}
           <div className="text-center mb-16">
