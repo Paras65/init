@@ -167,24 +167,30 @@ const Contact = () => {
 
         {/* Contact Info Section */}
         <div className="bg-gradient-to-r from-gray-100 to-gray-200 p-10 rounded-xl shadow-lg">
-          <h2 className="text-4xl font-semibold text-gray-800 text-center mb-8">Our Location</h2>
+  <h2 className="text-4xl font-semibold text-gray-800 text-center mb-8">Our Location</h2>
 
-          <div className="text-center mb-8">
-            <p className="text-lg text-gray-700">Visit us at:</p>
-            <p className="text-xl font-semibold text-gray-800">123 Adventure St, Cityville, ABC</p>
-            <p className="text-lg text-gray-700">Open Hours: Mon-Fri, 9am - 6pm</p>
-          </div>
+  <div className="text-center mb-8">
+    <p className="text-lg text-gray-700">Visit us at:</p>
+    <p className="text-xl font-semibold text-gray-800">36 Montane Adventure Camping, Saroda, Unnamed Road, Dadar, Mahali, Chhattisgarh 491559</p>
+    <p className="text-lg text-gray-700">Open Hours: Mon-Fri, 9am - 6pm</p>
+  </div>
+
+
 
           {/* Google Map Embed */}
           <div className="w-full h-64 mb-8">
-            <iframe
-              className="w-full h-full rounded-xl"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2996.3290674050236!2d-73.98566708435102!3d40.748817379328034!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259ae4c72b9b7%3A0x3f44b88f86e9e5ee!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1624888813207!5m2!1sen!2sus"
-              title="Google Map"
-              allowFullScreen=""
-              loading="lazy"
-            ></iframe>
-          </div>
+  <iframe
+    className="w-full h-full rounded-xl"
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29689.21596359117!2d81.707786!3d20.6944108!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a28f4c68833e5e1%3A0xd77560f57320d6d9!2s36%20Montane%20Adventure%20Camping%2C%20Saroda%2C%20Dadar%2C%20Mahali%2C%20Chhattisgarh%20491559!5e0!3m2!1sen!2sin!4v1713948503181!5m2!1sen!2sin"
+    title="Google Map - 36 Montane Adventure Camping"
+    allowfullscreen
+    loading="lazy"
+    frameborder="0"
+    aria-label="Map of 36 Montane Adventure Camping, Saroda, Dadar, Mahali, Chhattisgarh"
+  ></iframe>
+</div>
+
+
         </div>
       </div>
     </div>
