@@ -1,36 +1,34 @@
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+// You can install libphonenumber-js for better phone validation
+// npm install libphonenumber-js
+import { isValidPhoneNumber } from "libphonenumber-js";
+import { useLocation } from "react-router-dom";
 
 const BookingDetail = () => {
   // Initial form data and trip details state
+
+  const location = useLocation();
+  const tripDetails = location.state || {};
+
+  {console.log('tripDetails====>',tripDetails)}
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     groupSize: "1",
+    service: tripDetails,
     date: "",
   });
 
   const [errors, setErrors] = useState({});
-  const [totalPrice, setTotalPrice] = useState(200); // Start with base price
-
-  const tripDetails = {
-    title: "Mountain Trekking Adventure",
-    description:
-      "Embark on a breathtaking trekking journey through the heart of the mountains. Explore pristine trails, connect with nature, and challenge yourself to conquer some of the best views on earth.",
-    image: "https://picsum.photos/200/300?random=2?text=Mountain+Trekking",
-    basePrice: 200,
-    options: [
-      { label: "Group of 2-5", value: "2-5", additionalPrice: 50 },
-      { label: "Group of 6-10", value: "6-10", additionalPrice: 100 },
-      { label: "Private Guide", value: "Private", additionalPrice: 150 },
-    ],
-  };
+  const [totalPrice, setTotalPrice] = useState(tripDetails.price ); // Start with base price
 
   // Update total price whenever group size changes
   const updateTotalPrice = () => {
-    let price = tripDetails.basePrice;
+    let price = tripDetails.price;
 
     if (formData.groupSize === "2-5") price += tripDetails.options[0].additionalPrice;
     else if (formData.groupSize === "6-10") price += tripDetails.options[1].additionalPrice;
@@ -41,7 +39,7 @@ const BookingDetail = () => {
 
   useEffect(() => {
     updateTotalPrice();
-  }, [formData.groupSize]);
+  }, [formData.groupSize, tripDetails]);
 
   // Validate form data
   const validateForm = () => {
@@ -62,7 +60,7 @@ const BookingDetail = () => {
     // Phone Validation
     if (!formData.phone) {
       newErrors.phone = "Phone number is required";
-    } else if (!validatePhone(formData.phone)) {
+    } else if (!isValidPhoneNumber(formData.phone)) {
       newErrors.phone = "Please enter a valid phone number";
     }
 
@@ -86,56 +84,44 @@ const BookingDetail = () => {
     return emailPattern.test(email);
   };
 
-  // Validate phone number format (basic US format, adjust as needed)
-  const validatePhone = (phone) => {
-    const phonePattern = /^[2-9]{1}[0-9]{9}$/; // Simple validation for US phone numbers
-    return phonePattern.test(phone);
-  };
-
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    
+
     // Trigger real-time validation
+    validateField(name, value);
+  };
+
+  // Validate each field
+  const validateField = (name, value) => {
     const newErrors = { ...errors };
 
-    if (name === "name" && !value) {
-      newErrors.name = "Name is required";
-    } else {
-      delete newErrors.name;
-    }
-
-    if (name === "email") {
-      if (!value) {
-        newErrors.email = "Email is required";
-      } else if (!validateEmail(value)) {
-        newErrors.email = "Please enter a valid email address";
-      } else {
-        delete newErrors.email;
-      }
-    }
-
-    if (name === "phone") {
-      if (!value) {
-        newErrors.phone = "Phone number is required";
-      } else if (!validatePhone(value)) {
-        newErrors.phone = "Please enter a valid phone number";
-      } else {
-        delete newErrors.phone;
-      }
-    }
-
-    if (name === "date" && !value) {
-      newErrors.date = "Please select a date";
-    } else {
-      delete newErrors.date;
-    }
-
-    if (name === "groupSize" && !value) {
-      newErrors.groupSize = "Please select a group size";
-    } else {
-      delete newErrors.groupSize;
+    switch (name) {
+      case "name":
+        if (!value) newErrors.name = "Name is required";
+        else delete newErrors.name;
+        break;
+      case "email":
+        if (!value) newErrors.email = "Email is required";
+        else if (!validateEmail(value)) newErrors.email = "Please enter a valid email address";
+        else delete newErrors.email;
+        break;
+      case "phone":
+        if (!value) newErrors.phone = "Phone number is required";
+        else if (!isValidPhoneNumber(value)) newErrors.phone = "Please enter a valid phone number";
+        else delete newErrors.phone;
+        break;
+      case "date":
+        if (!value) newErrors.date = "Please select a date";
+        else delete newErrors.date;
+        break;
+      case "groupSize":
+        if (!value) newErrors.groupSize = "Please select a group size";
+        else delete newErrors.groupSize;
+        break;
+      default:
+        break;
     }
 
     setErrors(newErrors);
@@ -169,7 +155,7 @@ const BookingDetail = () => {
         {/* Trip Details Section */}
         <div className="bg-gray-50 rounded-xl shadow-lg overflow-hidden">
           <img
-            src={tripDetails.image}
+            src={tripDetails.headerImage?tripDetails.headerImage:tripDetails.image}
             alt="Trekking Adventure"
             className="w-full h-64 object-cover rounded-t-xl"
           />
@@ -179,7 +165,7 @@ const BookingDetail = () => {
 
             <div className="mt-8">
               <h3 className="text-xl font-semibold text-gray-800">Pricing</h3>
-              <p className="text-lg text-gray-800 mt-2">Base Price: <span className="text-green-600">${tripDetails.basePrice}</span></p>
+              <p className="text-lg text-gray-800 mt-2">Base Price: <span className="text-green-600">${tripDetails.price}</span></p>
               <p className="text-lg text-gray-800 mt-2">Total Price: <span className="text-green-600">${totalPrice}</span></p>
             </div>
           </div>
@@ -290,6 +276,22 @@ const BookingDetail = () => {
       <ToastContainer />
     </div>
   );
+};
+
+BookingDetail.propTypes = {
+  tripDetails: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    basePrice: PropTypes.number.isRequired,
+    options: PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        value: PropTypes.string.isRequired,
+        additionalPrice: PropTypes.number.isRequired,
+      })
+    ).isRequired,
+  }).isRequired,
 };
 
 export default BookingDetail;
