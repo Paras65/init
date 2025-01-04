@@ -10,3 +10,37 @@
   .transition-all {
     transition: all 0.3s ease-in-out;
   }
+
+
+  /* Prevent horizontal overflow for the entire page */
+body, html {
+  overflow-x: hidden;
+}
+
+/* Make sure the navbar and its container don’t overflow */
+nav {
+  width: 100%;
+  overflow: hidden;
+}
+
+.max-w-7xl {
+  max-width: 100%; /* Ensure the container doesn't cause overflow */
+}
+
+/* For desktop links: make sure they don’t push beyond the width */
+.md\\:flex {
+  display: flex;
+  flex-wrap: wrap;  /* Wrap the items if they overflow */
+}
+
+/* Mobile menu */
+#mobile-menu {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Optional: Reduce the padding/margin if necessary */
+.text-lg {
+  padding: 0.5rem;  /* Adjust as needed to prevent overflow */
+}
