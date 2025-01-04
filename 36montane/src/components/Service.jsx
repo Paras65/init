@@ -7,6 +7,7 @@ import SpinnerWithIcon from "./SpinnerWithIcon";
 import { faHiking } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // Categories for filtering
 const categories = [
@@ -21,8 +22,12 @@ const ItemCard = React.memo(({ item, handleBooking }) => (
     </LazyLoad>
     <div className="p-6">
       <div className="flex items-center mb-4">
-        {item.icon && <div className="text-3xl text-green-600 mr-4">{item.icon}</div>}
-        <h4 className="text-xl font-semibold">{item.title}</h4>
+        {item.icon && <div className="flex items-center mb-4">
+  <FontAwesomeIcon icon={faHiking} className="text-green-600 mr-2" size="lg" />
+  <h4 className="text-xl font-semibold">{item.title}</h4>
+</div>
+}
+        
       </div>
       <p className="mt-2 text-sm text-gray-700">{item.description}</p>
       <div className="mt-4">
