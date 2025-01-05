@@ -30,9 +30,9 @@ const BookingDetail = () => {
   const updateTotalPrice = () => {
     let price = tripDetails.price;
 
-    if (formData.groupSize === "2-5") price += tripDetails.options[0].additionalPrice;
-    else if (formData.groupSize === "6-10") price += tripDetails.options[1].additionalPrice;
-    else if (formData.groupSize === "Private") price += tripDetails.options[2].additionalPrice;
+    if (formData.groupSize === "2-5") price += price;
+    else if (formData.groupSize === "6-10") price +=price ;
+    else if (formData.groupSize === "Private") price +=price;
 
     setTotalPrice(price);
   };
