@@ -39,12 +39,15 @@ const Navbar = () => {
             <NavLink className="flex flex-shrink-0 items-center mr-4 group" to="/home">
               <span className="flex items-center text-orange-500 text-4xl font-extrabold tracking-widest ml-2">
                 <FontAwesomeIcon icon={faHiking} className="mr-2" />
-                36 Montane
+                {/* Dynamic font size for the logo and label */}
+                <span className="text-[vw] sm:text-[1rem] lg:text-[1.75rem]">
+                  36 Montane
+                </span>
               </span>
             </NavLink>
 
             {/* Desktop Links */}
-            <div className="hidden md:flex space-x-8 ml-auto">
+            <div className="hidden md:flex space-x-1vp ml-auto">
               {links.map(({ to, label }) => (
                 <NavLink key={to} to={to} className={linkClass}>
                   {label}
@@ -84,7 +87,7 @@ const Navbar = () => {
         <div
           id="mobile-menu"
           className={`md:hidden bg-transparent p-6 space-y-2 transition-all duration-300 ease-in-out ${
-            isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+            isOpen ? "max-h-screen opacity-100 transform translate-y-0" : "max-h-0 opacity-0 transform -translate-y-10"
           } overflow-hidden`}
         >
           <div className="flex flex-col items-start">
